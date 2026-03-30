@@ -39,6 +39,7 @@ class RightHandController:
         # Stroke drag state
         self._selected_stroke      = None
         self._start_stroke_points  = None   # copy of stroke.points at drag start
+        self._canvas               = None   # updated each frame, used in release
 
         # Release debounce: require OBJ_RELEASE_DEBOUNCE consecutive non-pinch
         # frames before actually dropping the held object.
@@ -77,8 +78,9 @@ class RightHandController:
                     self._on_pinch_release(right_pinch)
             return
 
-        # Pinch is active — reset release counter
+        # Pinch is active — reset release counter and cache canvas ref
         self._release_count = 0
+        self._canvas = canvas
 
         if not self._active:
             self._on_pinch_start(right_pinch, camera, scene_matrix,
@@ -121,21 +123,26 @@ class RightHandController:
                 self._start_stroke_points = list(stroke.points)
 
     def _on_pinch_hold(self, pinch) -> None:
+        mid = pinch.midpoint
         if self._selected_obj is not None:
-            mid = pinch.midpoint
             self._dustbin.highlight = self._dustbin.is_over(mid)
             if not self._dustbin.highlight:
                 self._manipulate(pinch)
 
         elif self._selected_stroke is not None:
-            self._drag_stroke(pinch)
+            self._dustbin.highlight = self._dustbin.is_over(mid)
+            if not self._dustbin.highlight:
+                self._drag_stroke(pinch)
 
     def _on_pinch_release(self, pinch) -> None:
         self._active        = False
         self._release_count = 0
 
-        if self._selected_obj is not None and self._dustbin.highlight:
-            self._mgr.remove(self._selected_obj)
+        if self._dustbin.highlight:
+            if self._selected_obj is not None:
+                self._mgr.remove(self._selected_obj)
+            elif self._selected_stroke is not None and self._canvas is not None:
+                self._canvas.remove_stroke(self._selected_stroke)
 
         self._dustbin.highlight    = False
         self._mgr.select(None)

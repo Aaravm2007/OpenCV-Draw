@@ -15,13 +15,14 @@ import numpy as np
 
 class Dustbin:
 
-    W = 60
+    W = 70
     H = 60
-    MARGIN = 12   # distance from frame edge
+    MARGIN  = 16   # distance from frame edge
+    BANNER_H = 30  # mode banner at bottom — dustbin sits above it
 
     def __init__(self, frame_width: int, frame_height: int) -> None:
         self.x = frame_width  - self.W - self.MARGIN
-        self.y = frame_height - self.H - self.MARGIN
+        self.y = frame_height - self.H - self.MARGIN - self.BANNER_H
         self.highlight: bool = False   # True when a dragged object is hovering over it
 
     # ------------------------------------------------------------------

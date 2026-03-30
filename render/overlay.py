@@ -140,26 +140,26 @@ class DebugOverlay:
             rz_deg = math.degrees(sc.rotation[2])
             lines.append(
                 f"Scene: pan=({px:.1f},{py:.1f}) "
-                f"zoom={sc.zoom:.2f} rot={rz_deg:.0f}\u00b0"
+                f"zoom={sc.zoom:.2f} rot={rz_deg:.0f}deg"
             )
 
-        lines.append("\u2500" * 26)
+        lines.append("-" * 26)
 
         def hand_block(label, hand, gesture, finger, pinch):
             if hand is None:
-                lines.append(f"{label}: \u2014")
+                lines.append(f"{label}: --")
                 return
             gname = gesture.name if gesture is not None else "?"
             lines.append(f"{label}: {gname}  conf={hand.confidence:.2f}")
             if finger is not None:
                 lines.append(f"  fingers: {finger}")
             if pinch is not None:
-                pstr = "\u25cf YES" if pinch.is_pinching else "no"
+                pstr = "YES" if pinch.is_pinching else "no"
                 ang  = math.degrees(pinch.angle)
                 lines.append(
                     f"  pinch: {pstr}  "
                     f"n={pinch.normalized_distance:.3f}  "
-                    f"ang={ang:.0f}\u00b0"
+                    f"ang={ang:.0f}deg"
                 )
 
         hand_block("Left ", tracking_result.left_hand,

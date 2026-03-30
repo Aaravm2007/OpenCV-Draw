@@ -140,6 +140,13 @@ class CanvasManager:
         """Append a pre-built stroke (used by load)."""
         self._strokes.append(stroke)
 
+    def remove_stroke(self, stroke: "Stroke") -> None:
+        """Remove a specific stroke (used by dustbin delete)."""
+        try:
+            self._strokes.remove(stroke)
+        except ValueError:
+            pass
+
     # ------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------
