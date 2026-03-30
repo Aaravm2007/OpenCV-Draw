@@ -100,7 +100,7 @@ def main() -> None:
     right_ctrl = RightHandController(object_manager, dustbin)
     left_ctrl  = LeftHandController(scene)
 
-    _spawn_default_objects(object_manager)
+    # _spawn_default_objects(object_manager)
 
     left_memory  = GestureMemory()
     right_memory = GestureMemory()
@@ -145,6 +145,9 @@ def main() -> None:
             frame_rgb.flags.writeable = False
             tracking_result = hand_tracker.process(frame_rgb, W, H)
             frame_rgb.flags.writeable = True
+
+            # Render on a black canvas instead of the video feed
+            frame = np.zeros((H, W, 3), dtype=np.uint8)
 
             hands_present = len(tracking_result.hands) > 0
 

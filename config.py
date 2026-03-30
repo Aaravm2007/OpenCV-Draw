@@ -66,8 +66,8 @@ PINCH_GRACE_FRAMES: int = 3
 # ---------------------------------------------------------------------------
 GESTURE_DEBOUNCE_FRAMES: int = 4    # Frames a gesture must hold before confirmed
                                      # Lower = more responsive; higher = more stable
-PINCH_ON_THRESHOLD:  float = 0.08   # Normalised thumb-index dist to ENTER pinch
-PINCH_OFF_THRESHOLD: float = 0.11   # Normalised dist to EXIT pinch (hysteresis gap)
+PINCH_ON_THRESHOLD:  float = 0.15   # Normalised thumb-index dist to ENTER pinch
+PINCH_OFF_THRESHOLD: float = 0.22   # Normalised dist to EXIT pinch (hysteresis gap)
 
 # ---------------------------------------------------------------------------
 # Activation
