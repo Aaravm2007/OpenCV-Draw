@@ -20,7 +20,7 @@ from typing import Optional
 import cv2
 import numpy as np
 
-from config import COLOR_LEFT_HAND, COLOR_RIGHT_HAND
+from config import COLOR_LEFT_HAND, COLOR_RIGHT_HAND, FOCAL_LENGTH, SCENE_CENTER_Z
 from core.state_manager import StateManager, AppState
 from gestures.gesture_classifier import Gesture
 from tracking.hand_tracker import HandTracker, TrackingResult
@@ -72,7 +72,16 @@ class Renderer:
 
         # 1 — canvas strokes (below everything)
         if canvas is not None:
-            canvas.render(frame)
+            if scene_controller is not None:
+                _pan_px = (
+                     scene_controller.pan[0] * FOCAL_LENGTH / SCENE_CENTER_Z,
+                    -scene_controller.pan[1] * FOCAL_LENGTH / SCENE_CENTER_Z,
+                )
+                _zoom = scene_controller.zoom
+            else:
+                _pan_px = (0.0, 0.0)
+                _zoom   = 1.0
+            canvas.render(frame, pan_px=_pan_px, zoom=_zoom)
 
         # 2 — 3-D wireframes
         if object_manager is not None and camera is not None:

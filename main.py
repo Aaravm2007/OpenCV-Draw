@@ -25,7 +25,7 @@ from utils.serialization import save_scene, load_scene
 
 from config import (
     WINDOW_NAME, FLIP_HORIZONTAL,
-    USER_LOST_IDLE_FRAMES, FOCAL_LENGTH,
+    USER_LOST_IDLE_FRAMES, FOCAL_LENGTH, SCENE_CENTER_Z,
     PINCH_GRACE_FRAMES,
 )
 import config
@@ -268,10 +268,19 @@ def main() -> None:
                     right_pinch if right_gesture == Gesture.PINCH else None
                 )
 
+                # ── Scene transform in pixel space (for canvas sync) ──
+                _zoom   = scene.zoom
+                _pan_px = (
+                     scene.pan[0] * FOCAL_LENGTH / SCENE_CENTER_Z,
+                    -scene.pan[1] * FOCAL_LENGTH / SCENE_CENTER_Z,
+                )
+
                 # ── Step 1: Object manipulation (right hand, PINCH) ───
                 # Must run BEFORE scene control so is_manipulating reflects
                 # the correct state for this frame's arbitration.
-                right_ctrl.update(right_pinch_gated, cam3d, scene_matrix)
+                right_ctrl.update(right_pinch_gated, cam3d, scene_matrix,
+                                  canvas=canvas, pan_px=_pan_px, zoom=_zoom,
+                                  screen_center=(W / 2.0, H / 2.0))
 
                 # ── Step 2: Scene control (left hand, PINCH) ──────────
                 # SUPPRESSED while an object is being actively dragged.
@@ -311,7 +320,14 @@ def main() -> None:
                 )
 
                 if can_draw and right_tip is not None:
-                    tip_px = (int(right_tip[0]), int(right_tip[1]))
+                    # Inverse-transform tip from screen → canonical space so
+                    # strokes are stored pan/zoom-independent and render correctly.
+                    _zs = max(_zoom, 0.01)
+                    _cx, _cy = W / 2.0, H / 2.0
+                    tip_px = (
+                        int(_cx + (right_tip[0] - _cx - _pan_px[0]) / _zs),
+                        int(_cy + (right_tip[1] - _cy - _pan_px[1]) / _zs),
+                    )
                     if canvas.is_drawing:
                         canvas.update_stroke(tip_px)
                     else:
